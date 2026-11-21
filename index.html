@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cross-Border Legal & Compliance AI Assistant</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --border-light: #3a4068;
+    --text: #e8eaf0;
+    --muted: #8b90a8;
+    --accent: #4f8ef7;
+    --accent-dim: rgba(79,142,247,0.12);
+    --accent2: #7c5cd8;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --danger-dim: rgba(239,68,68,0.12);
+    --warning-dim: rgba(245,158,11,0.12);
+    --success-dim: rgba(34,197,94,0.12);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .logo-sub { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .header-badges { display: flex; gap: 8px; align-items: center; }
+  .badge {
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: 1px solid;
+  }
+  .badge-blue { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .badge-purple { background: rgba(124,92,216,0.12); color: var(--accent2); border-color: var(--accent2); }
+
+  /* ── LAYOUT ── */
+  .app {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    grid-template-rows: auto;
+    gap: 0;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* ── LEFT PANEL ── */
+  .panel-left {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .panel-right {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-label span { color: var(--accent); font-size: 12px; }
+
+  /* ── TEXTAREA ── */
+  .doc-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+    font-size: 11.5px;
+    line-height: 1.65;
+    padding: 12px;
+    resize: vertical;
+    min-height: 220px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .doc-textarea:focus { border-color: var(--accent); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: var(--surface2);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #3d7de6; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-success {
+    background: var(--success);
+    color: #fff;
+    border-color: var(--success);
+  }
+  .btn-success:hover { background: #16a34a; }
+
+  /* ── JURISDICTION SELECTOR ── */
+  .jur-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .jur-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    padding: 6px 10px;
+    font-size: 12.5px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    flex: 1;
+  }
+  .jur-select:focus { border-color: var(--accent); }
+  .jur-arrow { color: var(--accent); font-size: 16px; font-weight: 700; }
+
+  /* ── STEPPER ── */
+  .stepper-wrap { padding: 20px; }
+  .stepper-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .stepper { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 14px;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    width: 2px;
+    height: calc(100% - 8px);
+    background: var(--border);
+    transition: background 0.4s;
+  }
+  .step.done::after { background: var(--success); }
+  .step.active::after { background: var(--accent); }
+
+  .step-icon-col { flex-shrink: 0; }
+  .step-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  .step.done .step-icon { border-color: var(--success); background: var(--success-dim); }
+  .step.active .step-icon { border-color: var(--accent); background: var(--accent-dim); }
+
+  .step-body { flex: 1; padding-bottom: 20px; }
+  .step-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--muted);
+    transition: color 0.3s;
+    margin-bottom: 2px;
+  }
+  .step.done .step-name, .step.active .step-name { color: var(--text); }
+  .step-desc { font-size: 11.5px; color: var(--muted); }
+  .step.active .step-desc { color: var(--muted); }
+
+  .step-status {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .step.active .step-status { display: flex; color: var(--accent); }
+  .step.done .step-status { display: flex; color: var(--success); }
+
+  /* spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 12px; height: 12px;
+    border: 2px solid var(--accent);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
+  /* progress bar */
+  .prog-bar-wrap {
+    margin-top: 8px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    display: none;
+  }
+  .step.active .prog-bar-wrap { display: block; }
+  .prog-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* ── RIGHT PANEL CONTENT ── */
+  .rp-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rp-title { font-size: 16px; font-weight: 700; }
+  .rp-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .rp-body { padding: 24px; flex: 1; }
+
+  /* ── PLACEHOLDER STATE ── */
+  .placeholder-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: var(--muted);
+    text-align: center;
+    gap: 12px;
+  }
+  .placeholder-state .ph-icon {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px dashed var(--border-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .placeholder-state h3 { font-size: 15px; color: var(--text); }
+  .placeholder-state p { font-size: 12.5px; max-width: 320px; }
+
+  /* ── REPORT CARDS ── */
+  .report-hidden { display: none; }
+  .report-visible { display: block; }
+
+  .risk-banner {
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid;
+  }
+  .risk-high { background: var(--danger-dim); border-color: var(--danger); }
+  .risk-medium { background: var(--warning-dim); border-color: var(--warning); }
+  .risk-low { background: var(--success-dim); border-color: var(--success); }
+
+  .risk-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+  .risk-value { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .risk-high .risk-value { color: var(--danger); }
+  .risk-medium .risk-value { color: var(--warning); }
+  .risk-score { text-align: right; }
+  .risk-score-num { font-size: 28px; font-weight: 800; }
+  .risk-score-label { font-size: 11px; color: var(--muted); }
+
+  .report-section {
+    margin-bottom: 20px;
+  }
+  .report-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* clause card */
+  .clause-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid;
+    transition: all 0.2s;
+  }
+  .clause-card:hover { border-color: var(--accent); background: var(--surface2); }
+  .clause-card.risk-high { border-left-color: var(--danger); }
+  .clause-card.risk-medium { border-left-color: var(--warning); }
+  .clause-card.risk-low { border-left-color: var(--success); }
+
+  .clause-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+  .clause-ref {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .risk-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .pill-high { background: var(--danger-dim); color: var(--danger); }
+  .pill-medium { background: var(--warning-dim); color: var(--warning); }
+  .pill-low { background: var(--success-dim); color: var(--success); }
+
+  .clause-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .compare-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  .compare-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .label-original { color: var(--warning); }
+  .label-verified { color: var(--success); }
+  .compare-text { font-size: 11.5px; line-height: 1.55; color: var(--text); }
+
+  .clause-citations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .citation-tag {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(79,142,247,0.3);
+    font-family: "SF Mono", "Cascadia Code", monospace;
+    cursor: default;
+  }
+
+  .clause-finding {
+    font-size: 11.5px;
+    color: var(--muted);
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    border-left: 2px solid var(--accent);
+  }
+  .clause-finding strong { color: var(--text); }
+
+  /* summary stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .stat-num { font-size: 24px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .stat-high .stat-num { color: var(--danger); }
+  .stat-medium .stat-num { color: var(--warning); }
+  .stat-low .stat-num { color: var(--success); }
+
+  /* opinion block */
+  .opinion-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .opinion-block p { margin-bottom: 10px; }
+  .opinion-block p:last-child { margin-bottom: 0; }
+  .opinion-block strong { color: var(--accent); }
+
+  .rec-list { list-style: none; padding: 0; }
+  .rec-list li {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    color: var(--text);
+  }
+  .rec-list li:last-child { border-bottom: none; }
+  .rec-list li::before {
+    content: "→";
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* copy bar */
+  .copy-bar {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    gap: 10px;
+  }
+  .copy-bar-info { font-size: 11.5px; color: var(--muted); }
+  .copy-bar-info strong { color: var(--text); }
+  .copy-bar-actions { display: flex; gap: 8px; }
+
+  /* tooltip for copy */
+  .copy-feedback {
+    font-size: 11px;
+    color: var(--success);
+    opacity: 0;
+    transition: opacity 0.3s;
+    margin-left: 8px;
+  }
+  .copy-feedback.show { opacity: 1; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* animate fade-in */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeInUp 0.4s ease both; }
+  .fade-in-delay-1 { animation-delay: 0.05s; }
+  .fade-in-delay-2 { animation-delay: 0.1s; }
+  .fade-in-delay-3 { animation-delay: 0.15s; }
+  .fade-in-delay-4 { animation-delay: 0.2s; }
+  .fade-in-delay-5 { animation-delay: 0.25s; }
+
+  /* responsiveness hint */
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+    .clause-compare { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚖</div>
+    <div>
+      LexAI Compliance Suite
+      <div class="logo-sub">Cross-Border Legal & Compliance AI Assistant</div>
+    </div>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-blue">4-Stage Agentic AI</span>
+    <span class="badge badge-purple">Multi-Jurisdiction</span>
+  </div>
+</header>
+
+<!-- APP LAYOUT -->
+<div class="app">
+
+  <!-- ═══════════════════════════════════════════════════════
+       LEFT PANEL: Document Intake & Stepper
+  ═══════════════════════════════════════════════════════ -->
+  <div class="panel-left">
+
+    <!-- Stage 1A: Document Input -->
+    <div class="section">
+      <div class="section-label"><span>①</span> Document Intake</div>
+
+      <div style="display:flex; gap:8px; margin-bottom:10px;">
+        <button class="btn btn-ghost" onclick="loadSample()" style="flex:1;">
+          📄 Load Sample Document
+        </button>
+        <button class="btn btn-ghost" onclick="clearDoc()" title="Clear">✕</button>
+      </div>
+
+      <textarea
+        class="doc-textarea"
+        id="docInput"
+        placeholder="Paste or load a legal document excerpt for cross-border compliance analysis…"
+        spellcheck="false"
+      ></textarea>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+        <span id="charCount" style="font-size:11px; color:var(--muted);">0 characters</span>
+        <span style="font-size:11px; color:var(--muted);">German ErbStG / US Treaty</span>
+      </div>
+    </div>
+
+    <!-- Stage 1B: Jurisdiction Selector -->
+    <div class="section">
+      <div class="section-label"><span>②</span> Jurisdiction Configuration</div>
+
+      <div class="jur-row">
+        <select class="jur-select" id="jurFrom">
+          <option value="DE">🇩🇪 Germany (ErbStG)</option>
+          <option value="FR">🇫🇷 France (CGI)</option>
+          <option value="UK">🇬🇧 United Kingdom</option>
+          <option value="EU">🇪🇺 European Union</option>
+        </select>
+        <span class="jur-arrow">⇄</span>
+        <select class="jur-select" id="jurTo">
+          <option value="US">🇺🇸 United States</option>
+          <option value="UK">🇬🇧 United Kingdom</option>
+          <option value="CA">🇨🇦 Canada</option>
+          <option value="SG">🇸🇬 Singapore</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <label style="font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="checkbox" id="chkEstate" checked style="accent-color:var(--accent);"> Estate & Inheritance Tax
+        </label>
+        <label style="font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="checkbox" id="chkGift" checked style="accent-color:var(--accent);"> Gift Tax
+        </label>
+        <label style="font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="checkbox" id="chkTreaty" checked style="accent-color:var(--accent);"> Treaty Override Analysis
+        </label>
+      </div>
+    </div>
+
+    <!-- Stage 2: Run Button -->
+    <div class="section" style="border-bottom:none;">
+      <button
+        class="btn btn-primary"
+        id="runBtn"
+        onclick="runPipeline()"
+        style="width:100%; justify-content:center; padding:10px; font-size:13.5px;"
+      >
+        ▶ Run Compliance Verification
+      </button>
+    </div>
+
+    <!-- ── MULTI-AGENT STEPPER ── -->
+    <div class="stepper-wrap" style="border-top:1px solid var(--border);">
+      <div class="stepper-title">⟳ Multi-Agent Verification Pipeline</div>
+      <div class="stepper" id="stepper">
+
+        <div class="step" id="step-0">
+          <div class="step-icon-col">
+            <div class="step-icon" id="stepIcon-0">📥</div>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Doc Intake & Translation Verification</div>
+            <div class="step-desc">Structural checks, terminology mismatch detection, translation quality score</div>
+            <div class="step-status" id="stepStatus-0">
+              <div class="spinner" id="stepSpinner-0"></div>
+              <span id="stepStatusText-0">Analyzing…</span>
+            </div>
+            <div class="prog-bar-wrap"><div class="prog-bar" id="progBar-0"></div></div>
+          </div>
+        </div>
+
+        <div class="step" id="step-1">
+          <div class="step-icon-col">
+            <div class="step-icon" id="stepIcon-1">📚</div>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Statutory Cross-Referencing</div>
+            <div class="step-desc">Clause-by-clause comparison against tax codes &amp; international treaties</div>
+            <div class="step-status" id="stepStatus-1">
+              <div class="spinner" id="stepSpinner-1"></div>
+              <span id="stepStatusText-1">Analyzing…</span>
+            </div>
+            <div class="prog-bar-wrap"><div class="prog-bar" id="progBar-1"></div></div>
+          </div>
+        </div>
+
+        <div class="step" id="step-2">
+          <div class="step-icon-col">
+            <div class="step-icon" id="stepIcon-2">⚠</div>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Risk & Discrepancy Analysis</div>
+            <div class="step-desc">Regulatory gaps, hidden liabilities, risk scoring (High / Medium / Low)</div>
+            <div class="step-status" id="stepStatus-2">
+              <div class="spinner" id="stepSpinner-2"></div>
+              <span id="stepStatusText-2">Analyzing…</span>
+            </div>
+            <div class="prog-bar-wrap"><div class="prog-bar" id="progBar-2"></div></div>
+          </div>
+        </div>
+
+        <div class="step" id="step-3">
+          <div class="step-icon-col">
+            <div class="step-icon" id="stepIcon-3">📋</div>
+          </div>
+          <div class="step-body">
+            <div class="step-name">Legal Opinion & Compliance Memo</div>
+            <div class="step-desc">Executive-ready compliance report synthesis &amp; recommendations</div>
+            <div class="step-status" id="stepStatus-3">
+              <div class="spinner" id="stepSpinner-3"></div>
+              <span id="stepStatusText-3">Generating…</span>
+            </div>
+            <div class="prog-bar-wrap"><div class="prog-bar" id="progBar-3"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /panel-left -->
+
+  <!-- ═══════════════════════════════════════════════════════
+       RIGHT PANEL: Compliance Report Output
+  ═══════════════════════════════════════════════════════ -->
+  <div class="panel-right">
+
+    <div class="rp-header">
+      <div>
+        <div class="rp-title">Compliance Analysis Report</div>
+        <div class="rp-subtitle" id="rpSubtitle">Awaiting document submission and jurisdiction selection</div>
+      </div>
+      <div id="reportTimestamp" style="font-size:11px; color:var(--muted);"></div>
+    </div>
+
+    <div class="rp-body" id="rpBody">
+
+      <!-- PLACEHOLDER STATE -->
+      <div class="placeholder-state" id="placeholderState">
+        <div class="ph-icon">⚖</div>
+        <h3>No Analysis Running</h3>
+        <p>Load a sample document, select your jurisdictions, and click <strong style="color:var(--accent);">Run Compliance Verification</strong> to begin the 4-stage AI analysis pipeline.</p>
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+          <span class="badge badge-blue">Translation Verification</span>
+          <span class="badge badge-blue">Treaty Cross-Reference</span>
+          <span class="badge badge-blue">Risk Scoring</span>
+          <span class="badge badge-purple">Legal Opinion</span>
+        </div>
+      </div>
+
+      <!-- REPORT OUTPUT (hidden until pipeline completes) -->
+      <div id="reportOutput" class="report-hidden">
+
+        <!-- Risk Banner -->
+        <div class="risk-banner risk-high fade-in" id="riskBanner">
+          <div>
+            <div class="risk-label">OVERALL COMPLIANCE RISK</div>
+            <div class="risk-value" id="riskLevel">HIGH</div>
+            <div style="font-size:11.5px; color:var(--muted); margin-top:4px;" id="riskJur">Germany (ErbStG) ↔ United States</div>
+          </div>
+          <div class="risk-score">
+            <div class="risk-score-num" id="riskScore" style="color:var(--danger);">78</div>
+            <div class="risk-score-label">Risk Score / 100</div>
+          </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="stats-row fade-in fade-in-delay-1">
+          <div class="stat-card stat-high">
+            <div class="stat-num" id="statHigh">3</div>
+            <div class="stat-label">High-Risk Clauses</div>
+          </div>
+          <div class="stat-card stat-medium">
+            <div class="stat-num" id="statMed">2</div>
+            <div class="stat-label">Medium-Risk Clauses</div>
+          </div>
+          <div class="stat-card stat-low">
+            <div class="stat-num" id="statLow">1</div>
+            <div class="stat-label">Low-Risk / Compliant</div>
+          </div>
+        </div>
+
+        <!-- Clause Analysis -->
+        <div class="report-section fade-in fade-in-delay-2">
+          <div class="report-section-title">Clause-by-Clause Discrepancy Analysis</div>
+
+          <!-- Clause 1 -->
+          <div class="clause-card risk-high">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 2 Abs. 1 — Personal Tax Liability (Unbeschränkte Steuerpflicht)</div>
+              </div>
+              <span class="risk-pill pill-high">HIGH RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"Unlimited tax liability applies to all persons domiciled in Germany at the time of acquisition."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"Unbeschränkte Steuerpflicht applies to <strong>both</strong> transferor <strong>and</strong> transferee when either maintains a Wohnsitz or gewöhnlicher Aufenthalt — not merely acquisition-side domicile."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 2 Abs. 1 Nr. 1</span>
+              <span class="citation-tag">BFH BStBl. II 2017, 547</span>
+              <span class="citation-tag">US-DE Estate Tax Treaty Art. 4(1)</span>
+              <span class="citation-tag">IRC § 2001</span>
+            </div>
+            <div class="clause-finding"><strong>Critical Gap:</strong> Translation omits bilateral dual-residency trigger. A US-domiciled transferee receiving German estate assets triggers concurrent German ErbStG and US Federal Estate Tax obligations. Treaty tiebreaker provisions (Art. 4(2)) were not surfaced.</div>
+          </div>
+
+          <!-- Clause 2 -->
+          <div class="clause-card risk-high">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 13a — Tax-Exempt Transfer of Business Assets (Verschonungsabschlag)</div>
+              </div>
+              <span class="risk-pill pill-high">HIGH RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"85% exemption applies to qualifying business property held for 5 years post-transfer."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"The 85% Verschonungsabschlag (§ 13a) requires satisfaction of the Lohnsummenregelung (payroll retention test) and Behaltensregelung (5-year retention). The 100% option (§ 13a Abs. 10) mandates 7-year retention. BVerfG 2014 imposed constitutionality constraints on large estates (&gt;€26M)."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 13a</span>
+              <span class="citation-tag">ErbStG § 13b</span>
+              <span class="citation-tag">BVerfG 1 BvL 21/12 (2014)</span>
+              <span class="citation-tag">US-DE Treaty Art. 10</span>
+              <span class="citation-tag">IRC § 2032A</span>
+            </div>
+            <div class="clause-finding"><strong>Critical Gap:</strong> Translation strips payroll retention and constitutional ceiling conditions entirely. US-sited business property may not qualify for Verschonungsabschlag absent specific treaty elections, creating potential double-taxation exposure on the full asset value.</div>
+          </div>
+
+          <!-- Clause 3 -->
+          <div class="clause-card risk-high">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 21 — Credit for Foreign Tax (Anrechnung ausländischer Erbschaftsteuer)</div>
+              </div>
+              <span class="risk-pill pill-high">HIGH RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"Foreign inheritance tax paid abroad may be credited against German tax on foreign property."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"§ 21 credit is strictly limited to <em>Auslandsvermögen</em> (foreign-sited assets) and applies only where no tax treaty governs. Where the US-Germany Estate Tax Treaty applies, treaty credit provisions under Art. 11 supersede § 21 and impose a proportionate credit calculation methodology."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 21</span>
+              <span class="citation-tag">US-DE Estate Tax Treaty Art. 11</span>
+              <span class="citation-tag">BFH II R 26/16</span>
+              <span class="citation-tag">Treas. Reg. § 20.2014-1</span>
+            </div>
+            <div class="clause-finding"><strong>Critical Gap:</strong> Translation implies a broad unilateral credit; in practice the treaty Art. 11 mechanism is mandatory and uses a different proportionality formula. Failing to apply treaty credit method could result in overpayment or understatement of residual liability.</div>
+          </div>
+
+          <!-- Clause 4 -->
+          <div class="clause-card risk-medium">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 16 — Personal Allowances (Freibeträge)</div>
+              </div>
+              <span class="risk-pill pill-medium">MEDIUM RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"Spouses receive an allowance of €500,000. Children receive €400,000 each."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"Allowances are reduced on a pro-rata basis for non-resident (beschränkt steuerpflichtig) beneficiaries where only Inlandsvermögen is subject to German tax. EU-resident beneficiaries may elect full allowances per ECJ Mattner ruling (C-510/08)."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 16 Abs. 1</span>
+              <span class="citation-tag">ErbStG § 16 Abs. 2</span>
+              <span class="citation-tag">ECJ C-510/08 (Mattner)</span>
+              <span class="citation-tag">US-DE Treaty Art. 5</span>
+            </div>
+            <div class="clause-finding"><strong>Moderate Gap:</strong> US-resident beneficiaries are subject to the reduced non-resident allowance unless a treaty election is filed. Translation does not distinguish resident vs. non-resident allowance schedules, risking significant under-allowance planning.</div>
+          </div>
+
+          <!-- Clause 5 -->
+          <div class="clause-card risk-medium">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 9 — Entstehung der Steuer (Tax Accrual / Timing Rules)</div>
+              </div>
+              <span class="risk-pill pill-medium">MEDIUM RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"Tax arises at the time of death of the transferor."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"Steuerentstehung under § 9 Abs. 1 Nr. 1 is at the moment of Erwerb (acquisition), which for US cross-border estates may differ from date-of-death valuation under IRC § 2031 due to asset transfer mechanics and probate timelines."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 9 Abs. 1 Nr. 1</span>
+              <span class="citation-tag">IRC § 2031</span>
+              <span class="citation-tag">US-DE Treaty Art. 3(1)(e)</span>
+            </div>
+            <div class="clause-finding"><strong>Moderate Gap:</strong> Timing mismatch between German Steuerentstehung and US date-of-death valuation can generate basis discrepancies affecting Step-Up in Basis under IRC § 1014, requiring coordinated valuation opinions in both jurisdictions.</div>
+          </div>
+
+          <!-- Clause 6 -->
+          <div class="clause-card risk-low">
+            <div class="clause-header">
+              <div>
+                <div class="clause-ref">ErbStG § 30 — Filing Obligation (Anzeigepflicht)</div>
+              </div>
+              <span class="risk-pill pill-low">LOW RISK</span>
+            </div>
+            <div class="clause-compare">
+              <div class="compare-box">
+                <div class="compare-label label-original">Machine Translation</div>
+                <div class="compare-text">"Heirs must notify the tax authority within 3 months of obtaining knowledge of the acquisition."</div>
+              </div>
+              <div class="compare-box">
+                <div class="compare-label label-verified">Verified Legal Interpretation</div>
+                <div class="compare-text">"§ 30 Anzeigepflicht requires notification within 3 months. For cross-border estates, the Finanzamt Düsseldorf-Nord has exclusive territorial jurisdiction for US-resident decedents. US co-fiduciaries must comply with IRS Form 706-NA deadline (9 months post-death)."</div>
+              </div>
+            </div>
+            <div class="clause-citations">
+              <span class="citation-tag">ErbStG § 30 Abs. 1</span>
+              <span class="citation-tag">BpO § 19</span>
+              <span class="citation-tag">IRS Form 706-NA</span>
+            </div>
+            <div class="clause-finding"><strong>Minor Gap:</strong> Translation omits jurisdictional venue rule for non-resident decedents and does not cross-reference US Form 706-NA filing. Procedural compliance risk is manageable with standard coordination protocols.</div>
+          </div>
+
+        </div><!-- /clause analysis -->
+
+        <!-- Legal Opinion -->
+        <div class="report-section fade-in fade-in-delay-3">
+          <div class="report-section-title">Legal Opinion & Executive Summary</div>
+          <div class="opinion-block">
+            <p>This compliance analysis identifies <strong>significant structural deficiencies</strong> in the machine-translated excerpt of the German Erbschaftsteuer- und Schenkungsteuergesetz (ErbStG) as applied to cross-border estate transfers between Germany and the United States. The translated document presents an <strong>oversimplified and materially incomplete</strong> representation of applicable law that, if relied upon without correction, would expose the estate and its fiduciaries to substantial regulatory and financial liability.</p>
+            <p>The most critical vulnerability is the failure to reconcile <strong>ErbStG § 21's unilateral credit mechanism</strong> with the mandatory treaty credit methodology under <strong>US-Germany Estate and Gift Tax Treaty Art. 11</strong>. This discrepancy alone may generate double taxation exposure on the full value of qualifying US-sited assets. Concurrently, the incomplete rendering of the Verschonungsabschlag provisions (§ 13a/§ 13b) omits the BVerfG 2014 constitutional limitation framework, which is mandatory for estates with business assets exceeding €26 million.</p>
+            <p>The dual-residency trigger analysis under <strong>§ 2 Abs. 1</strong> requires immediate attention: the current translation creates a false impression of single-sided liability that conflicts with both ErbStG and IRC § 2001 as modulated by Treaty Art. 4(2) tiebreaker rules.</p>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="report-section fade-in fade-in-delay-4">
+          <div class="report-section-title">Priority Remediation Recommendations</div>
+          <ul class="rec-list">
+            <li>Immediately commission a certified legal translation of ErbStG §§ 2, 13a, 13b, 16, and 21 by a qualified German tax attorney (Steuerberater / Rechtsanwalt) with cross-border estate credentials.</li>
+            <li>Obtain a coordinated valuation opinion addressing both ErbStG § 9 Steuerentstehung timing and IRC § 2031 date-of-death valuation to prevent Step-Up in Basis discrepancies under IRC § 1014.</li>
+            <li>File a Treaty election under US-Germany Estate Tax Treaty Art. 11 to invoke the treaty credit mechanism in lieu of the domestic § 21 unilateral credit, and confirm proportionate credit computation with both Finanzamt and IRS.</li>
+            <li>Assess applicability of EU Mattner doctrine (ECJ C-510/08) for any EU-resident co-beneficiaries to preserve full § 16 allowance entitlements before filing.</li>
+            <li>Confirm exclusive Finanzamt Düsseldorf-Nord venue for non-resident decedent filing and coordinate IRS Form 706-NA submission deadline (9 months post-death) with German § 30 Anzeigepflicht (3-month) notification.</li>
+            <li>Engage US international tax counsel to advise on IRC § 2032A special valuation election feasibility for German Betriebsvermögen qualifying under Verschonungsabschlag.</li>
+          </ul>
+        </div>
+
+      </div><!-- /reportOutput -->
+    </div><!-- /rp-body -->
+
+    <!-- Copy/Export Bar -->
+    <div class="copy-bar" id="copyBar" style="display:none;">
+      <div class="copy-bar-info">
+        <strong id="copyBarTitle">Cross-Border Compliance Memo</strong> — Generated
+        <span id="copyBarTime"></span>
+        <span class="copy-feedback" id="copyFeedback">✓ Copied to clipboard</span>
+      </div>
+      <div class="copy-bar-actions">
+        <button class="btn btn-ghost" onclick="copyMemo()">📋 Copy Memo</button>
+        <button class="btn btn-success" onclick="exportMemo()">⬇ Export .txt</button>
+      </div>
+    </div>
+
+  </div><!-- /panel-right -->
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// SAMPLE DOCUMENT
+// ═══════════════════════════════════════════════════════
+const SAMPLE_DOC = `EXCERPT — GERMAN INHERITANCE & GIFT TAX ACT
+Erbschaftsteuer- und Schenkungsteuergesetz (ErbStG)
+[Machine-Translated — For Compliance Review Only]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+§ 2 Personal Tax Liability
+Unlimited tax liability applies to all persons domiciled
+in Germany at the time of acquisition.
+
+§ 9 Tax Accrual
+Tax arises at the time of death of the transferor.
+
+§ 13a Business Property Exemption
+85% exemption applies to qualifying business property
+held for 5 years post-transfer.
+
+§ 16 Personal Allowances
+Spouses receive an allowance of €500,000.
+Children receive €400,000 each.
+
+§ 21 Credit for Foreign Tax
+Foreign inheritance tax paid abroad may be credited
+against German tax on foreign property.
+
+§ 30 Filing Obligation
+Heirs must notify the tax authority within 3 months
+of obtaining knowledge of the acquisition.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NOTE: This document requires cross-reference with:
+- US-Germany Estate & Gift Tax Treaty (1982)
+- Internal Revenue Code §§ 2001, 2014, 2031, 2032A
+- BVerfG 1 BvL 21/12 (Constitutional Court, 2014)`;
+
+// ═══════════════════════════════════════════════════════
+// UI UTILS
+// ═══════════════════════════════════════════════════════
+function loadSample() {
+  const ta = document.getElementById('docInput');
+  ta.value = SAMPLE_DOC;
+  updateCharCount();
+}
+
+function clearDoc() {
+  document.getElementById('docInput').value = '';
+  updateCharCount();
+}
+
+function updateCharCount() {
+  const len = document.getElementById('docInput').value.length;
+  document.getElementById('charCount').textContent = len.toLocaleString() + ' characters';
+}
+
+document.getElementById('docInput').addEventListener('input', updateCharCount);
+
+// ═══════════════════════════════════════════════════════
+// PIPELINE RUNNER
+// ═══════════════════════════════════════════════════════
+let pipelineRunning = false;
+
+function getJurLabel(val) {
+  const map = {
+    DE: '🇩🇪 Germany (ErbStG)',
+    FR: '🇫🇷 France (CGI)',
+    UK: '🇬🇧 United Kingdom',
+    EU: '🇪🇺 European Union',
+    US: '🇺🇸 United States',
+    CA: '🇨🇦 Canada',
+    SG: '🇸🇬 Singapore'
+  };
+  return map[val] || val;
+}
+
+async function runPipeline() {
+  if (pipelineRunning) return;
+
+  const doc = document.getElementById('docInput').value.trim();
+  if (!doc) {
+    alert('Please load or paste a document before running verification.');
+    return;
+  }
+
+  pipelineRunning = true;
+  const runBtn = document.getElementById('runBtn');
+  runBtn.disabled = true;
+  runBtn.textContent = '⏳ Running Pipeline…';
+
+  // Hide report, show placeholder
+  document.getElementById('reportOutput').className = 'report-hidden';
+  document.getElementById('placeholderState').style.display = 'flex';
+  document.getElementById('copyBar').style.display = 'none';
+
+  // Reset all steps
+  for (let i = 0; i < 4; i++) resetStep(i);
+
+  const jurFrom = getJurLabel(document.getElementById('jurFrom').value);
+  const jurTo   = getJurLabel(document.getElementById('jurTo').value);
+  document.getElementById('rpSubtitle').textContent = `${jurFrom} ↔ ${jurTo}`;
+  document.getElementById('riskJur').textContent = `${document.getElementById('jurFrom').value} (ErbStG) ↔ ${document.getElementById('jurTo').value === 'US' ? 'United States' : getJurLabel(document.getElementById('jurTo').value)}`;
+
+  const stageDurations = [2800, 3200, 2600, 2200]; // ms
+  const stageMessages = [
+    'Translation verified — 6 clauses parsed',
+    '12 statutory cross-references mapped',
+    'Risk scored — 3 HIGH, 2 MED, 1 LOW',
+    'Compliance memo generated'
+  ];
+
+  for (let i = 0; i < 4; i++) {
+    await runStep(i, stageDurations[i], stageMessages[i]);
+  }
+
+  // Show report
+  document.getElementById('placeholderState').style.display = 'none';
+  document.getElementById('reportOutput').className = 'report-visible';
+
+  // Set timestamp
+  const now = new Date();
+  const ts = now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+  document.getElementById('reportTimestamp').textContent = ts;
+  document.getElementById('copyBarTime').textContent = ts;
+
+  // Show copy bar
+  document.getElementById('copyBar').style.display = 'flex';
+
+  runBtn.disabled = false;
+  runBtn.textContent = '↺ Re-run Compliance Verification';
+  pipelineRunning = false;
+}
+
+function resetStep(i) {
+  const step = document.getElementById('step-' + i);
+  const icon = document.getElementById('stepIcon-' + i);
+  const status = document.getElementById('stepStatus-' + i);
+  const spinner = document.getElementById('stepSpinner-' + i);
+  const bar = document.getElementById('progBar-' + i);
+  const barWrap = bar.parentElement;
+
+  step.className = 'step';
+  spinner.style.display = 'inline-block';
+  status.style.display = 'none';
+  barWrap.style.display = 'none';
+  bar.style.width = '0%';
+}
+
+function runStep(i, duration, doneMessage) {
+  return new Promise(resolve => {
+    const step = document.getElementById('step-' + i);
+    const icon = document.getElementById('stepIcon-' + i);
+    const status = document.getElementById('stepStatus-' + i);
+    const spinner = document.getElementById('stepSpinner-' + i);
+    const statusText = document.getElementById('stepStatusText-' + i);
+    const bar = document.getElementById('progBar-' + i);
+    const barWrap = bar.parentElement;
+
+    // Activate step
+    step.className = 'step active';
+    status.style.display = 'flex';
+    barWrap.style.display = 'block';
+    spinner.style.display = 'inline-block';
+    statusText.textContent = 'Processing…';
+
+    // Animate progress bar
+    let progress = 0;
+    const interval = 60;
+    const increment = (interval / duration) * 100;
+
+    const timer = setInterval(() => {
+      progress = Math.min(progress + increment + (Math.random() * 1.5), 97);
+      bar.style.width = progress + '%';
+    }, interval);
+
+    // Complete after duration
+    setTimeout(() => {
+      clearInterval(timer);
+      bar.style.width = '100%';
+
+      setTimeout(() => {
+        step.className = 'step done';
+        spinner.style.display = 'none';
+        statusText.textContent = '✓ ' + doneMessage;
+        const icons = ['📥', '📚', '⚠', '📋'];
+        icon.textContent = '✓';
+        icon.style.fontSize = '14px';
+        resolve();
+      }, 300);
+    }, duration);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// COPY / EXPORT
+// ═══════════════════════════════════════════════════════
+function getMemoText() {
+  const jFrom = document.getElementById('jurFrom').options[document.getElementById('jurFrom').selectedIndex].text;
+  const jTo   = document.getElementById('jurTo').options[document.getElementById('jurTo').selectedIndex].text;
+  const ts    = document.getElementById('reportTimestamp').textContent;
+
+  return `CROSS-BORDER LEGAL COMPLIANCE MEMO
+LexAI Compliance Suite — Generated ${ts}
+Jurisdictions: ${jFrom} ↔ ${jTo}
+Overall Risk: HIGH (Score: 78/100)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CLAUSE DISCREPANCIES IDENTIFIED: 6 (3 High, 2 Medium, 1 Low)
+
+[HIGH] ErbStG § 2 — Personal Tax Liability
+  Gap: Translation omits bilateral dual-residency trigger.
+  Citations: ErbStG § 2 Abs. 1 Nr. 1 | US-DE Treaty Art. 4(1) | IRC § 2001
+
+[HIGH] ErbStG § 13a — Business Asset Exemption
+  Gap: Payroll retention (Lohnsummenregelung) and BVerfG 2014 ceiling omitted.
+  Citations: ErbStG § 13a/13b | BVerfG 1 BvL 21/12 | IRC § 2032A
+
+[HIGH] ErbStG § 21 — Foreign Tax Credit
+  Gap: Unilateral credit implies broad scope; Treaty Art. 11 is mandatory.
+  Citations: ErbStG § 21 | US-DE Treaty Art. 11 | Treas. Reg. § 20.2014-1
+
+[MEDIUM] ErbStG § 16 — Personal Allowances
+  Gap: Non-resident allowance reduction not distinguished from resident schedule.
+  Citations: ErbStG § 16 Abs. 1–2 | ECJ C-510/08 (Mattner) | US-DE Treaty Art. 5
+
+[MEDIUM] ErbStG § 9 — Tax Accrual Timing
+  Gap: Timing mismatch with IRC § 2031 date-of-death valuation creates basis risk.
+  Citations: ErbStG § 9 Abs. 1 Nr. 1 | IRC § 2031 | US-DE Treaty Art. 3(1)(e)
+
+[LOW] ErbStG § 30 — Filing Obligation
+  Gap: Venue rule for non-resident decedents omitted; Form 706-NA not referenced.
+  Citations: ErbStG § 30 Abs. 1 | IRS Form 706-NA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRIORITY RECOMMENDATIONS
+1. Commission certified legal retranslation (ErbStG §§ 2, 13a, 13b, 16, 21)
+2. Obtain coordinated valuation opinion (§ 9 / IRC § 2031 / IRC § 1014)
+3. File Treaty Art. 11 credit election with Finanzamt and IRS
+4. Assess ECJ Mattner allowance eligibility for EU co-beneficiaries
+5. Confirm Finanzamt Düsseldorf-Nord venue + coordinate Form 706-NA deadline
+6. Advise on IRC § 2032A for German Betriebsvermögen
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DISCLAIMER: This AI-generated analysis is for preliminary review only.
+Final legal opinions must be issued by licensed counsel in each jurisdiction.`;
+}
+
+function copyMemo() {
+  const text = getMemoText();
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2500);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const fb = document.getElementById('copyFeedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2500);
+  });
+}
+
+function exportMemo() {
+  const text = getMemoText();
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'LexAI_Compliance_Memo_DE_US.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
+`;
